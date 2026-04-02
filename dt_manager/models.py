@@ -12,11 +12,19 @@ class CardType(str, Enum):
     EVENT = "event"
 
 
+class PlayerType(str, Enum):
+    ATTACKER = "A"  # Attaccante
+    DEFENDER = "D"  # Difensore
+    MIDFIELDER = "C"  # Centrocampista
+    GOALKEEPER = "P"  # Portiere
+
+
 @dataclass(frozen=True)
 class PlayerCard:
     name: str
     attack: int
     defense: int
+    type: PlayerType
     positive_effect: Optional[str] = None
     negative_effect: Optional[str] = None
     tags: tuple[str, ...] = ()

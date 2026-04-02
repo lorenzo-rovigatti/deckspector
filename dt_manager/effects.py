@@ -60,6 +60,12 @@ def _apply_regista_draw_tactic(game: GameState, ctx: TurnContext, side: str) -> 
     ctx.notes.append(f"{side}: Regista pesca 1 Tattica")
 
 
+def _apply_portiere_save(game: GameState, ctx: TurnContext, side: str) -> None:
+    if side != "defense":
+        return
+    ctx.defense_goal_roll_modifier -= 1
+    ctx.notes.append(f"{side}: Portiere pronto a ridurre di 1 il dado per parare il gol")
+
 
 def _apply_mediano_support(game: GameState, ctx: TurnContext, side: str) -> None:
     lineup = lineup_for_side(ctx, side)
@@ -205,6 +211,7 @@ PLAYER_EFFECTS = {
     "attaccante_combo": _apply_attaccante_combo,
     "difensore_combo": _apply_difensore_combo,
     "regista_draw_tactic": _apply_regista_draw_tactic,
+    "portiere_save": _apply_portiere_save,
     "mediano_support": _apply_mediano_support,
     "franz_motivatore": _apply_franz_motivatore,
     "franz_urlatore": _apply_franz_urlatore,

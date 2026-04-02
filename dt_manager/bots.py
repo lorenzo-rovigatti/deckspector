@@ -5,7 +5,13 @@ import itertools
 import random
 from typing import List, Optional
 
-from .models import BotAdapter, EventCard, GameState, Selection, TeamState
+from .models import BotAdapter, EventCard, GameState, PlayerType, Selection, TeamState
+
+
+def is_valid_lineup(players) -> bool:
+    """Check that a lineup doesn't have multiple goalkeepers."""
+    goalkeeper_count = sum(1 for card in players if card.type == PlayerType.GOALKEEPER)
+    return goalkeeper_count <= 1
 
 
 @dataclass
@@ -18,7 +24,13 @@ class RandomBot:
         if len(available) < 2:
             chosen_players = available[:]
         else:
-            chosen_players = self.rng.sample(available, 2)
+            # Only consider valid lineups (no multiple goalkeepers)
+            valid_combos = [combo for combo in itertools.combinations(available, 2) if is_valid_lineup(combo)]
+            if not valid_combos:
+                # Fallback: take any available players if no valid combos
+                chosen_players = available[:2]
+            else:
+                chosen_players = list(self.rng.choice(valid_combos))
 
         candidate_tactics = []
         if team.active_tactic is not None:
@@ -46,6 +58,8 @@ class GreedyBot:
         role = "attack" if team_idx == game.current_attacker else "defense"
         available = team.available_players()
         combos = list(itertools.combinations(available, 2)) if len(available) >= 2 else [tuple(available)]
+        # Filter to only valid lineups (no multiple goalkeepers)
+        combos = [combo for combo in combos if is_valid_lineup(combo)]
         if not combos:
             combos = [tuple()]
 
